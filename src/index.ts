@@ -29,7 +29,7 @@ export function createAdatbankClient(overrides: Partial<ClientConfig> = {}): Ada
     matches: new MatchesService(http, config.baseUrl, config.meccsCenterUrl),
     standings: new StandingsService(http, config.baseUrl),
     clubs: new ClubsService(http, config.baseUrl),
-    players: new PlayersService(http, config.baseUrl),
+    players: new PlayersService(http, config.baseUrl, config.meccsCenterUrl),
     stats: new StatsService(http, config.baseUrl, config.meccsCenterUrl),
     search: new SearchService(http, config.meccsCenterUrl),
   };

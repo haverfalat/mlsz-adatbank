@@ -160,11 +160,23 @@ const schedule = await client.clubs.schedule(roundCtx, 328184); // Fixture[]
 
 ```ts
 const profile = await client.players.get(437842); // PlayerProfile
+const matches = await client.players.matchStats({
+  teamLeagueId: 335564,
+  playerId: 1065796,
+  season: '2026/2027',
+  leagueId: 33821,
+}); // PlayerMatchStat[]
 ```
 
 The profile includes the player photo, season-by-season statistics (appearances,
 subs, goals, own goals, yellow/red cards), and the transfer history with dates
-and club names.
+and club names. Each competition row that has its match list already expanded
+on the page carries those rows as `matches`.
+
+`matchStats` posts to the internal `ajax.php` endpoint behind the drop-down
+toggle and returns the match-by-match lines for one competition: opponent,
+score, match id and round, plus the starter, sub, bench, goal, own-goal, yellow
+and red figures for the player in each match.
 
 ### StatsService
 
@@ -205,6 +217,7 @@ feed in fixtures from disk.
 | `parseMatchDetail`           | A match HTML string and the match id.                  |
 | `parseClubDetail`            | A club page HTML.                                      |
 | `parsePlayerProfile`         | A player page HTML.                                    |
+| `parsePlayerMatchStats`      | Match-stat rows from `ajax.php`.                       |
 | `parseSearchResults`         | A search page HTML, plus the query string.             |
 
 ## HTTP client
@@ -228,7 +241,8 @@ The domain types are grouped by page family in `src/domain`:
 - `matchday.ts`: `MatchDay`, `MatchDayGroup`, `MatchDayMatch`, `MatchState`.
 - `stats.ts`: `ScorerRow`, `CardRow`, `CardColor`.
 - `club.ts`: `ClubDetail`, `ClubContact`.
-- `player.ts`: `PlayerProfile`, `PlayerSeasonStats`, `PlayerTransfer`.
+- `player.ts`: `PlayerProfile`, `PlayerSeasonBlock`, `PlayerSeasonStat`,
+  `PlayerTransfer`, `PlayerMatchStat`.
 
 All values are returned exactly as published, except that surrounding
 whitespace is trimmed and missing optional values are `undefined` rather than

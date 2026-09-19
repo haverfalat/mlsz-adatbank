@@ -1,4 +1,4 @@
-import { PlayerRef, TeamRef } from './common.js';
+import { PlayerRef, Scored, TeamRef } from './common.js';
 
 export interface PlayerSeasonStat {
   appearances: number;
@@ -21,6 +21,23 @@ export interface PlayerCompetitionStat extends PlayerSeasonStat {
   position?: string;
   teamId?: number;
   leagueId?: number;
+  matches?: PlayerMatchStat[];
+}
+
+export interface PlayerMatchStat {
+  round?: number;
+  matchId?: number;
+  matchHref?: string;
+  home: { name: string; logo?: string };
+  away: { name: string; logo?: string };
+  score: Scored;
+  starts: number;
+  subs: number;
+  bench: number;
+  goals: number;
+  ownGoals: number;
+  yellows: number;
+  reds: number;
 }
 
 export interface PlayerSeasonBlock {
