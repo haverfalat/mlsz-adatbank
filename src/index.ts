@@ -6,6 +6,7 @@ import { StandingsService } from './services/standings.js';
 import { ClubsService } from './services/clubs.js';
 import { PlayersService } from './services/players.js';
 import { StatsService } from './services/stats.js';
+import { SearchService } from './services/search.js';
 
 export interface AdatbankClient {
   config: ClientConfig;
@@ -15,6 +16,7 @@ export interface AdatbankClient {
   clubs: ClubsService;
   players: PlayersService;
   stats: StatsService;
+  search: SearchService;
 }
 
 export function createAdatbankClient(overrides: Partial<ClientConfig> = {}): AdatbankClient {
@@ -29,6 +31,7 @@ export function createAdatbankClient(overrides: Partial<ClientConfig> = {}): Ada
     clubs: new ClubsService(http, config.baseUrl),
     players: new PlayersService(http, config.baseUrl),
     stats: new StatsService(http, config.baseUrl, config.meccsCenterUrl),
+    search: new SearchService(http, config.meccsCenterUrl),
   };
 }
 
@@ -43,6 +46,7 @@ export * from './domain/stats.js';
 export * from './domain/matchday.js';
 export * from './domain/club.js';
 export * from './domain/player.js';
+export * from './domain/search.js';
 
 export * from './parsers/options.js';
 export * from './parsers/fixtures.js';
@@ -52,3 +56,4 @@ export * from './parsers/stats.js';
 export * from './parsers/matchDetails.js';
 export * from './parsers/clubDetails.js';
 export * from './parsers/playerDetails.js';
+export * from './parsers/search.js';

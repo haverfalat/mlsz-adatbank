@@ -13,8 +13,9 @@ Hungarian football federation (MLSZ) Adatbank site.
   - [MatchesService](#matchesservice)
   - [StandingsService](#standingsservice)
   - [ClubsService](#clubsservice)
-  - [PlayersService](#playersservice)
-  - [StatsService](#statsservice)
+- [PlayersService](#playersservice)
+- [StatsService](#statsservice)
+- [SearchService](#searchservice)
 - [Low-level Parsers](#low-level-parsers)
 - [HTTP client](#http-client)
 - [Data model](#data-model)
@@ -72,13 +73,13 @@ createAdatbankClient({
 });
 ```
 
-| Option         | Default                     | Meaning                                 |
-| -------------- | --------------------------- | --------------------------------------- |
-| `baseUrl`      | `https://adatbank.mlsz.hu`  | League, match and club pages.           |
-| `meccsCenterUrl` | `https://ada1bank.mlsz.hu` | Fixture and lineup pages.               |
-| `timeoutMs`    | `15000`                     | Per-request timeout in milliseconds.    |
-| `retries`      | `2`                         | Extra attempts after a failed request.  |
-| `fetchFn`      | global `fetch`              | Drop-in replacement for testing or proxying. |
+| Option           | Default                    | Meaning                                      |
+| ---------------- | -------------------------- | -------------------------------------------- |
+| `baseUrl`        | `https://adatbank.mlsz.hu` | League, match and club pages.                |
+| `meccsCenterUrl` | `https://ada1bank.mlsz.hu` | Fixture and lineup pages.                    |
+| `timeoutMs`      | `15000`                    | Per-request timeout in milliseconds.         |
+| `retries`        | `2`                        | Extra attempts after a failed request.       |
+| `fetchFn`        | global `fetch`             | Drop-in replacement for testing or proxying. |
 
 The client sets a common browser user agent and an `accept-language: hu` header
 on every request.
@@ -107,10 +108,10 @@ Reads the homepage dropdowns and the hidden current selection.
 const options = await client.leagues.options();
 // { seasons, federations, leagues, rounds, state }
 
-const seasons = await client.leagues.seasons();     // SelectOption[]
-const feds = await client.leagues.federations();    // SelectOption[]
-const leagues = await client.leagues.leagues();     // SelectOption[]
-const rounds = await client.leagues.rounds();       // SelectOption[]
+const seasons = await client.leagues.seasons(); // SelectOption[]
+const feds = await client.leagues.federations(); // SelectOption[]
+const leagues = await client.leagues.leagues(); // SelectOption[]
+const rounds = await client.leagues.rounds(); // SelectOption[]
 ```
 
 `options()` returns everything in one request. The other four are thin
@@ -119,8 +120,8 @@ convenience wrappers around it.
 ### MatchesService
 
 ```ts
-const fixtures = await client.matches.listRound(roundCtx);   // Fixture[]
-const detail = await client.matches.detail(2186424);          // MatchDetail
+const fixtures = await client.matches.listRound(roundCtx); // Fixture[]
+const detail = await client.matches.detail(2186424); // MatchDetail
 const day = await client.matches.listByDate({ date: '2026-09-19' }); // MatchDay
 ```
 
@@ -147,7 +148,7 @@ recent form chips with their result descriptions.
 ### ClubsService
 
 ```ts
-const club = await client.clubs.get(roundCtx, 328184);   // ClubDetail
+const club = await client.clubs.get(roundCtx, 328184); // ClubDetail
 const schedule = await client.clubs.schedule(roundCtx, 328184); // Fixture[]
 ```
 
@@ -158,7 +159,7 @@ const schedule = await client.clubs.schedule(roundCtx, 328184); // Fixture[]
 ### PlayersService
 
 ```ts
-const profile = await client.players.get(437842);   // PlayerProfile
+const profile = await client.players.get(437842); // PlayerProfile
 ```
 
 The profile includes the player photo, season-by-season statistics (appearances,
@@ -176,22 +177,35 @@ const red = await client.stats.cards(roundCtx, 'red');
 Scorer rows carry rank, player (name, id, photo), goals and club. Card rows
 carry the same player bounds with the yellow and red totals.
 
+### SearchService
+
+```ts
+const results = await client.search.search('Gipsy Jakab');
+// { query, players: [...], teams: [...] }
+```
+
+Players and clubs are matched independently. Player hits carry the birth date,
+the player id and the current club when it is published. Club hits carry the
+club id, the league name and the season / federation / league context taken
+from the result link. When a box has no match it is skipped.
+
 ## Low-level Parsers
 
 Every page parser is exported standalone. Each takes a raw HTML string and
 returns the plain data shape, which is useful if you want to cache responses or
 feed in fixtures from disk.
 
-| Parser                    | Input rule                                            |
-| ------------------------- | ----------------------------------------------------- |
-| `parseLeagueOptions`      | Homepage HTML.                                        |
-| `parseFixtures`           | League HTML, plus a CSS selector for the fixture pane.|
-| `parseStandings`          | League HTML.                                          |
-| `parseMatchDay`           | A day page HTML.                                      |
-| `parseScorers`, `parseCards` | Leaderboard HTML.                                  |
-| `parseMatchDetail`        | A match HTML string and the match id.                 |
-| `parseClubDetail`         | A club page HTML.                                     |
-| `parsePlayerProfile`      | A player page HTML.                                   |
+| Parser                       | Input rule                                             |
+| ---------------------------- | ------------------------------------------------------ |
+| `parseLeagueOptions`         | Homepage HTML.                                         |
+| `parseFixtures`              | League HTML, plus a CSS selector for the fixture pane. |
+| `parseStandings`             | League HTML.                                           |
+| `parseMatchDay`              | A day page HTML.                                       |
+| `parseScorers`, `parseCards` | Leaderboard HTML.                                      |
+| `parseMatchDetail`           | A match HTML string and the match id.                  |
+| `parseClubDetail`            | A club page HTML.                                      |
+| `parsePlayerProfile`         | A player page HTML.                                    |
+| `parseSearchResults`         | A search page HTML, plus the query string.             |
 
 ## HTTP client
 
